@@ -1,0 +1,79 @@
+
+ <div id="upload-dialog" class="modal fade" tabindex="-1" role="dialog">
+   <div class="modal-dialog modal-sm">
+     <div class="modal-content">
+       <div class="modal-header">
+         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+         <h4 class="modal-title">Upload Pictures</h4>
+       </div>
+       <div class="modal-body">
+         <form method="POST" action="/upload">
+          <label class="btn btn-default btn-file">
+            Browse <input type="file" name="upload" id="upload" multiple style="display: none;" />
+          </label>
+          &nbsp;<span class="feedback">(select image files)</span>
+         </form>
+       </div>
+       <div class="modal-footer">
+         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+         <button type="button" class="btn btn-primary">Upload</button>
+       </div>
+     </div>
+   </div>
+ </div>
+
+ <div id="reset-dialog" class="modal fade" tabindex="-1" role="dialog">
+   <div class="modal-dialog modal-sm">
+     <div class="modal-content">
+       <div class="modal-header">
+         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+         <h4 class="modal-title">Reset Sequence</h4>
+       </div>
+       <div class="modal-body">
+         <p>Restart sequence, showing all pictures with equal likelyhood?</p>
+       </div>
+       <div class="modal-footer">
+         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+         <button type="button" class="btn btn-primary">Reset</button>
+       </div>
+     </div>
+   </div>
+ </div>
+
+ <script src="/js/jquery.min.js"></script>
+ <script src="/js/bootstrap.min.js"></script>
+ <script type="text/javascript">
+ $(document).ready(function() {
+
+   // picture upload
+   $('#navbar a.upload').click(function(e) {
+     e.preventDefault();
+     $('#upload-dialog .btn-primary').prop('disabled', true);
+     $('#upload-dialog').modal();
+   });
+   $('#upload-dialog :file').on('change', function() {
+     var input = $(this),
+         count = input.get(0).files ? input.get(0).files.length : 1,
+         name = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+     if (count > 0) {
+       input.closest('form').find('.feedback').text(count == 1 ? name : count + ' files selected');
+       input.closest('.modal').find('.modal-footer .btn-primary').prop('disabled', false);
+     }
+   });
+   $('#upload-dialog .btn-primary').on('click', function() {
+     console.log('upload');
+   });
+
+   // reset sequence
+   $('#navbar a.reset').click(function(e) {
+     e.preventDefault();
+     $('#reset-dialog').modal();
+   });
+   $('#reset-dialog .btn-primary').on('click', function() {
+     console.log('reset');
+     window.location = '?reset';
+   });
+ });
+ </script>
+</body>
+</html>

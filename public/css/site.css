@@ -1,0 +1,18 @@
+#navbar {
+  font-size: 14pt;
+}
+.navbar-brand {
+  padding: 0;
+  padding-left: 30px;
+}
+.navbar-brand h1 {
+  margin: 0;
+  padding-top: 10pt;
+  font-size: 18pt;
+}
+.picture {
+  text-align: center;
+}
+.picture img {
+  width: 100%;
+}

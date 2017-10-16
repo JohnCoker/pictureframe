@@ -1,0 +1,18 @@
+{
+  "name": "pictureframe",
+  "version": "1.0.0",
+  "description": "photo picture frame server",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "John Coker <john@jcsw.com> (http://johncoker.com/)",
+  "license": "ISC",
+  "dependencies": {
+    "cookie-parser": "^1.4.3",
+    "express": "^4.16.2",
+    "morgan": "^1.9.0",
+    "serve-favicon": "^2.4.5",
+    "sse-node": "^1.0.2"
+  }
+}
