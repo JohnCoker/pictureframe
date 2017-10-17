@@ -141,7 +141,7 @@ class Pictures {
       }
     }
     if (this.$cur == null)
-      this.$cur = this.$list[0];
+      this.switch(this.$list[0]);
   }
 
   byFile(file) {

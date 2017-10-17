@@ -12,7 +12,7 @@
  <meta name="msapplication-TileImage" content="/images/favicon-144.png">
 </head>
 <body>
- <nav class="navbar navbar-inverse">
+ <nav class="navbar">
   <div class="container">
    <div class="navbar-header">
     <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -21,10 +21,10 @@
      <span class="icon-bar"></span>
      <span class="icon-bar"></span>
     </button>
-    <a class="navbar-brand" href="#">
-     <img src="/images/header-icon.png" />
+    <a class="navbar-brand" href="https://github.com/JohnCoker/pictureframe">
+     <img src="/images/header-icon.png" width="50" height="50" />
     </a>
-    <a class="navbar-brand hidden-xs" href="#">
+    <a class="navbar-brand hidden-xs" href="https://github.com/JohnCoker/pictureframe">
      <h1>Picture Frame</h1>
     </a>
    </div>
@@ -44,6 +44,7 @@
        <li><a class="upload" href="#">Upload Pictures</a></li>
        <li><a href="?resume">Resume Sequence</a></li>
        <li><a class="reset" href="?reset">Reset Sequence</a></li>
+       <li><a class="reload" href="?reload">Reload Pictures</a></li>
       </ul>
      </li>
     </ul>

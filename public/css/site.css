@@ -1,3 +1,6 @@
+.navbar {
+  border-bottom: 1px solid #73b0e5;
+}
 #navbar {
   font-size: 14pt;
 }
@@ -13,6 +16,6 @@
 .picture {
   text-align: center;
 }
-.picture img {
+.picture img, .no-pictures {
   width: 100%;
 }
