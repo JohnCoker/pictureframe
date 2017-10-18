@@ -9,8 +9,8 @@ In particular, it shows a different picture each day from the collection of phot
 
 The picture frame is implemented with a single [Node.js](https://en.wikipedia.org/wiki/Node.js)
 application that supports two different web pages:
- - `/`: view and control the picture frame's behavior
- - `/frame`: page to view the current day's picture
+ - `/manage.html`: view and control the picture frame's behavior
+ - `/frame.html`: page to view the current day's picture
 
 Connections can be made to the manage page to view pictures uploaded and control the behavior.
 

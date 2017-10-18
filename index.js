@@ -98,7 +98,6 @@ router.get(['/', '/index.html', '/manage', '/manage.html'], function(req, res, n
   parts.push(' <div class="container">\n');
 
   if (feedback.length > 0) {
-    parts.push(' <div class="container">\n');
     for (let i = 0; i < feedback.length; i++) {
       parts.push(`  <div class="alert alert-info" role="alert">
    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -106,7 +105,6 @@ router.get(['/', '/index.html', '/manage', '/manage.html'], function(req, res, n
   </div>
 `);
     }
-    parts.push('</div>\n');
   }
 
   if (pictures.length < 1) {
