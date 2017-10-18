@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Picture Frame</title>
+  <link href="/css/frame.css" rel="stylesheet" />
+ </head>
+ <body>
+  <img id="current" src="/picture/current" />
+
+  <script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', function () {
+    if (typeof EventSource == 'function') {
+      var version = 0;
+      var source = new EventSource("/sse");
+      source.addEventListener('switch', function(e) {
+        version++;
+
+        var img = document.getElementById("current");
+        if (img) {
+           var src = img.src;
+           src = src.replace(/\?.*$/, '') + '?v=' + version.toFixed();
+           img.src = src;
+        }
+      });
+    }
+  });
+  </script>
+ </body>
+</html>

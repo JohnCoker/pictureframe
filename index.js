@@ -8,13 +8,15 @@ const path = require('path'),
       fs = require('fs'),
       express = require('express'),
       favicon = require('serve-favicon'),
+      SSE = require('express-sse'),
       logger = require('morgan'),
       cookieParser = require('cookie-parser'),
       config = require('./config/server.js'),
       Pictures = require('./pictures.js');
 
 const app = express(),
-      router = express.Router();
+      router = express.Router(),
+      sse = new SSE();
 
 app.use(logger('dev'));
 app.use(favicon(__dirname + '/public/favicon.ico'));
@@ -162,6 +164,10 @@ router.get(['/', '/index.html', '/manage', '/manage.html'], function(req, res, n
   res.end();
 });
 
+router.get('/frame', function(req, res, next) {
+  res.redirect(301, '/frame.html');
+});
+
 router.get(['/picture/current', '/thumbnail/current'], function(req, res, next) {
   if (pictures.current) {
     res.sendFile(pictures.current.path, {
@@ -185,6 +191,12 @@ router.get(['/picture/:file', '/thumbnail/:file'], function(req, res, next) {
     res.sendFile(found.path);
   else
     res.status(404).send();
+});
+
+router.get(['/sse', '/sse.html'], sse.init);
+
+pictures.on('switch', function(cur) {
+  sse.send(cur == null ? "none" : cur.file, 'switch');
 });
 
 app.use('/', router);

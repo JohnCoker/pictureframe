@@ -1,5 +1,6 @@
 const path = require('path'),
-      fs = require('fs');
+      fs = require('fs'),
+      EventEmitter = require('events');
 
 function compareName(a, b) {
 
@@ -52,8 +53,10 @@ function compareUpdated(a, b) {
   return compareName(a, b);
 }
 
-class Pictures {
+class Pictures extends EventEmitter {
   constructor(config) {
+    super();
+
     if (config) {
       this.$dir = config.pictures;
       this.$exts = config.extensions;
@@ -89,6 +92,7 @@ class Pictures {
       if (v != this.$cur) {
         this.$cur = v;
         this.$cur.lastShown = new Date();
+        this.emit('switch', v);
         return true;
       }
     }
