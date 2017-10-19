@@ -44,6 +44,7 @@ npm install
 [From these instructions](https://github.com/chovy/node-startup), in a terminal:
 ```
 sudo cp config/tinkerboard/init.d /etc/init.d/pictureframe
+sudo chmod 755 /etc/init.d/pictureframe
 sudo update-rc.d pictureframe defaults
 sudo /etc/init.d/pictureframe start
 ```

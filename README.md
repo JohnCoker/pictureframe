@@ -17,7 +17,7 @@ Connections can be made to the manage page to view pictures uploaded and control
 New pictures can be uploading from that page, or you can issue HTTP requests PUT and DELETE in the
 `/pictures/` folder.
 
-A web browser in kiosk mode is pointed to the `/frame` page that displays only the current picture.
+A web browser in kiosk mode is pointed to the `/frame.html` page that displays only the current picture.
 The web browser needs to support
 [server-sent events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events),
 which is used to update the display when the current picture changes (either because it is a new
@@ -35,10 +35,12 @@ As far as disk space, you need enough for the OS and the pictures you want to up
 
 2. Install Node.js then install this application and set it to start at computer boot-up.
 
-3. Set the screen saver to execute the browser in kiosk mode showing `http://localhost/frame`.
+3. Set the computer to start a browser in kiosk mode showing `http://localhost/frame`.
 
 4. Copy your pictures into the pictures folder of this app or upload them through the web server.
 
 5. Connect the SBC's HDMI output to your TV.
 
 6. Connect to the SBC's web interface from your computer or phone to manage it.
+
+See detailed instructions for individual SBCs in the `config` directory.
