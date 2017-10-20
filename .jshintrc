@@ -1,0 +1,19 @@
+// http://www.jshint.com/docs/
+{
+  "node": true,
+  "jasmine": true,
+  "eqnull": true,
+  "strict": false,
+  "undef": true,
+  "unused": "vars",
+  "evil": "true",
+  "loopfunc": "true",
+  "esnext": "true",
+  "predef": [
+    "beforeAll",
+    "afterAll",
+    "fail",
+    "fdescribe",
+    "fit"
+  ]
+}

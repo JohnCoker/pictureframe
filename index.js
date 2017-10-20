@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 John Coker for ThrustCurve.org
+ * Copyright 2017 John Coker
  * Licensed under the ISC License, https://opensource.org/licenses/ISC
  */
 'use strict';
@@ -12,7 +12,7 @@ const path = require('path'),
       logger = require('morgan'),
       cookieParser = require('cookie-parser'),
       config = require('./config/server.js'),
-      Pictures = require('./pictures.js');
+      Pictures = require('./lib/pictures.js');
 
 const app = express(),
       router = express.Router(),
@@ -58,6 +58,9 @@ function formatCaption(picture, when) {
   return encodeHTML(picture.file) + ', ' + when;
 }
 
+/*
+ * The manage route shows a page with the current picture at the top and the other ones in a table below.
+ */
 router.get(['/', '/index.html', '/manage', '/manage.html'], function(req, res, next) {
 
   var feedback = [];
@@ -78,12 +81,12 @@ router.get(['/', '/index.html', '/manage', '/manage.html'], function(req, res, n
 
     if (pictures.current) {
       let encoded = encodeHTML(pictures.current.file);
-      feedback.push('Resumed sequence with ${encoded}.');
+      feedback.push(`Resumed sequence with ${encoded}.`);
     }
   }
 
   // collect the sort order
-  let sort, setSort = false;
+  let sort;
   if (req.query.hasOwnProperty('sort') &&
       /^(name|shown|updated)$/.test(req.query.sort.toLowerCase())) {
     sort = req.query.sort;
@@ -162,10 +165,16 @@ router.get(['/', '/index.html', '/manage', '/manage.html'], function(req, res, n
   res.end();
 });
 
+/*
+ * The frame route shows a page with the current picture full screen.
+ */
 router.get('/frame', function(req, res, next) {
   res.redirect(301, '/frame.html');
 });
 
+/*
+ * The /picture/current route returns just the current image.
+ */
 router.get(['/picture/current', '/thumbnail/current'], function(req, res, next) {
   if (pictures.current) {
     res.sendFile(pictures.current.path, {
@@ -181,6 +190,9 @@ router.get(['/picture/current', '/thumbnail/current'], function(req, res, next) 
     res.status(404).send();
 });
 
+/*
+ * The /picture/<file> route returns a single picture image.
+ */
 router.get(['/picture/:file', '/thumbnail/:file'], function(req, res, next) {
   let found;
   if (req.params.file != null && req.params.file !== '')
@@ -191,6 +203,9 @@ router.get(['/picture/:file', '/thumbnail/:file'], function(req, res, next) {
     res.status(404).send();
 });
 
+/*
+ * The /sse route sets up a server-sent events connection.
+ */
 router.get(['/sse', '/sse.html'], sse.init);
 
 pictures.on('switch', function(cur) {

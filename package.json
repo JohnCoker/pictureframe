@@ -4,7 +4,8 @@
   "description": "photo picture frame server",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node_modules/jasmine/bin/jasmine.js",
+    "lint": "jshint index.js lib/*.js"
   },
   "author": "John Coker <john@jcsw.com> (http://johncoker.com/)",
   "license": "ISC",
@@ -12,7 +13,11 @@
     "cookie-parser": "^1.4.3",
     "express": "^4.16.2",
     "express-sse": "^0.4.1",
+    "jasmine": "^2.8.0",
     "morgan": "^1.9.0",
-    "serve-favicon": "^2.4.5",
+    "serve-favicon": "^2.4.5"
+  },
+  "devDependencies": {
+    "jasmine": "^2.5.2"
   }
 }
