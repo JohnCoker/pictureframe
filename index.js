@@ -27,7 +27,10 @@ app.use(cookieParser());
 const pictures = new Pictures(config);
 pictures.reload();
 
-// main page is dynamic
+/*
+ * The manage route shows a page with the current picture at the top and the other ones in a table below.
+ * The table is dynamic, but we use a static header and footer surrounding it.
+ */
 const manageRoot = path.join(__dirname + '/public/manage/'),
       manageHeader = fs.readFileSync(path.join(manageRoot, 'header.incl'), 'utf8'),
       manageFooter = fs.readFileSync(path.join(manageRoot, 'footer.incl'), 'utf8');
@@ -58,9 +61,6 @@ function formatCaption(picture, when) {
   return encodeHTML(picture.file) + ', ' + when;
 }
 
-/*
- * The manage route shows a page with the current picture at the top and the other ones in a table below.
- */
 router.get(['/', '/index.html', '/manage', '/manage.html'], function(req, res, next) {
 
   var feedback = [];
@@ -114,43 +114,48 @@ router.get(['/', '/index.html', '/manage', '/manage.html'], function(req, res, n
     parts.push('<p>No pictures in the frame yet; use <strong>Manage</strong> | <strong>Upload Pictures</strong> above to change that.</p>\n');
     parts.push('<img class="no-pictures" src="images/no-pictures.jpg" />\n');
   } else {
+    const cols = 12, span = 3;
+
+    // current picture is full width
     let current = pictures.current;
     if (current) {
       let caption = formatCaption(current, 'showing now');
       parts.push(`  <div class="row">
-     <div class="col-sm-12 picture current">
+     <div class="col-sm-${cols} picture current">
       <img src="/picture/current" />
       <p class="caption">${caption}</p>
      </div>
     </div>\n`);
     }
-  
+
+    // other pictures in a grid below
     if (pictures.length > 1 || pictures.length === 1 && current == null) {
       parts.push('  <div class="row">\n');
-      let col = 0;
+      let rows = 1, col = 0;
       let sorted = pictures.sorted(sort);
       for (let i = 0; i < sorted.length; i++) {
         if (sorted[i] == current)
           continue;
   
-        if (col >= 12) {
+        if (col >= cols) {
           parts.push('  </div>\n');
           parts.push('  <div class="row">\n');
           col = 0;
+          rows++;
         }
-        parts.push('   <div class="col-sm-3 picture">\n');
+        parts.push(`   <div class="col-sm-${span} picture">\n`);
         let encoded = encodeURIComponent(sorted[i].file);
         parts.push(`    <a href="?switch=${encoded}"><img src="/thumbnail/${encoded}" /></a>\n`);
         let caption = formatCaption(sorted[i]);
         parts.push(`    <p class="caption">${caption}</p>\n`);
         parts.push('   </div>\n');
-        col += 3;
+        col += span;
       }
-      if (col < 12)
-        parts.push(`   <div class="col-sm-${12 - col}">&nbsp;</div>\n`);
+      if (col < cols)
+        parts.push(`   <div class="col-sm-${cols - col}">&nbsp;</div>\n`);
       parts.push('  </div>\n');
 
-      if (sorted.length > 5)
+      if (rows > 2)
         parts.push('  <p style="text-align: center;"><a href="#navbar">Back to Top</p>\n');
     }
   }
