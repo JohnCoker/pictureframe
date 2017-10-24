@@ -11,6 +11,7 @@ const path = require('path'),
       SSE = require('express-sse'),
       logger = require('morgan'),
       cookieParser = require('cookie-parser'),
+      sharp = require('sharp'),
       config = require('./config/server.js'),
       Pictures = require('./lib/pictures.js');
 
@@ -196,15 +197,61 @@ router.get(['/picture/current', '/thumbnail/current'], function(req, res, next) 
 });
 
 /*
- * The /picture/<file> route returns a single picture image.
+ * The /picture/<file> route returns a single picture image, full size.
  */
-router.get(['/picture/:file', '/thumbnail/:file'], function(req, res, next) {
+router.get('/picture/:file', function(req, res, next) {
   let found;
   if (req.params.file != null && req.params.file !== '')
     found = pictures.byFile(req.params.file);
   if (found)
     res.sendFile(found.path);
   else
+    res.status(404).send();
+});
+
+/*
+ * The /thumbnail/<file> route returns a single picture image, reduced size.
+ */
+router.get('/thumbnail/:file', function(req, res, next) {
+  let found;
+  if (req.params.file != null && req.params.file !== '')
+    found = pictures.byFile(req.params.file);
+  if (found) {
+    fs.readFile(found.path, function(err, data) {
+      if (err) {
+        if (err.code == 'ENOENT' || err.code == 'EISDIR')
+          res.status(404).send();
+        else if (err.code == 'EACCESS')
+          res.status(403).send();
+        else
+          res.status(500).send(err.toString());
+        return;
+      }
+
+      const image = sharp(data);
+      image
+        .metadata()
+        .then(info => {
+          let height = 1080 / 4;
+          let width = Math.round((info.width / info.height) * height);
+          image
+            .resize(width, height, {
+              kernel: sharp.kernel.lanczos2
+            })
+            .toBuffer(function(err, data) {
+              if (err) {
+                res.status(500).send(err.toString());
+                return;
+              }
+              res.type('image/' + info.format)
+                .send(data);
+            });
+        })
+        .catch(err => {
+          res.status(500).send(err.toString());
+        });
+    });
+  } else
     res.status(404).send();
 });
 
