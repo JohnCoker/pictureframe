@@ -72,6 +72,8 @@ the same picture of the day.
 The top-level `index.js` script contains the logic that manages the HTTP routes using Express.
 The `lib` directory contains modules which implement classes used by the server.
 
+| name         | description |
+|:------------ |:----------- |
 | README.md    | this file |
 | artwork      | original artwork |
 | bin          | scripts |
@@ -82,3 +84,10 @@ The `lib` directory contains modules which implement classes used by the server.
 | pictures     | location of pictures to display |
 | public       | static HTTP content |
 | spec         | Jasmine tests |
+
+To play with it, locally:
+ - copy some images into `pictures`
+ - `npm install`
+ - `bin/www`
+ - browse to `http://localhost:3000/`
+ - open another tab to `http://localhost:3000/frame.html`
