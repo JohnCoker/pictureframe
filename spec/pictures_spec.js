@@ -57,6 +57,7 @@ describe("pictures", function() {
       expect(sorted).toBeDefined();
       expect(sorted.length).toBe(3);
       expect(sorted[0].file).toBe('balloons.png');
+      expect(sorted[0].updated).toBeGreaterThan(new Date('2017-10-20'));
     });
     it("forEach", function() {
       let f = [];
