@@ -61,10 +61,68 @@ describe("pictures", function() {
     });
     it("forEach", function() {
       let f = [];
+      let shown = 0;
       pictures.forEach(function(p) {
+        expect(p.file).toBeDefined();
+        expect(p.path).toMatch(new RegExp('/' + p.file + '$'));
+        expect(p.updated).toBeGreaterThan(new Date('2017-10-20'));
+        if (p.lastShown != null)
+          shown++;
         f.push(p.file);
       });
       expect(f).toEqual(['balloons.png', 'drops.jpg', 'watch.jpeg']);
+      expect(shown).toBeLessThan(2);
+    });
+  });
+
+  describe("event", function() {
+    beforeEach(function(done) {
+      done();
+    });
+
+    let pictures;
+    let events = [];
+    it("setup", function() {
+      pictures = new Pictures({
+        pictures: SAMPLES,
+        extensions: ['jpg', 'jpeg', 'png']
+      });
+      pictures.onSwitch(function(p) {
+        expect(typeof p).toBe('object');
+        expect(p.file).toBeDefined();
+        expect(p.lastShown).toBeDefined();
+        events.push(p);
+      });
+      pictures.reload();
+    });
+    it("initial event", function() {
+      expect(events.length).toBe(1);
+      expect(events[0].file).toBe('balloons.png');
+      expect(events[0].lastShown).toBeDefined();
+    });
+    it("switch same", function() {
+      pictures.switch(pictures.current);
+      pictures.switch('balloons.png');
+      expect(events.length).toBe(1);
+    });
+    it("no event after same", function() {
+      expect(events.length).toBe(1);
+    });
+    it("reload", function() {
+      pictures.reload();
+    });
+    it("no event after reload", function() {
+      expect(events.length).toBe(1);
+    });
+    it("switch other", function() {
+      pictures.switch('drops.jpg');
+    });
+    it("event after switch", function() {
+      expect(events.length).toBe(2);
+      expect(events[1].file).toBe('drops.jpg');
+      expect(events[1].lastShown).toBeDefined();
+      if (events[1].lastShown.getTime() != events[0].lastShown.getTime())
+        expect(events[1].lastShown).toBeGreaterThan(events[0].lastShown);
     });
   });
 });
