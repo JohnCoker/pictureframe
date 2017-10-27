@@ -73,6 +73,22 @@
      console.log('reset');
      window.location = '?reset';
    });
+
+   // warn if server time is off
+   var serverOffset = $('#feedback').data('timezone');
+   var serverTime = $('#feedback').data('time');
+   var warning;
+   if (typeof serverOffset == 'number' && serverOffset != new Date().getTimezoneOffset()) {
+     warning = 'Server time zone is different from your browser\'s; picture may not change with the new day.';
+   } else if (typeof serverTime == 'number' && Math.abs(serverTime - new Date().getTime()) > 15 * 60 * 1000) {
+     warning = 'Server time is different from your browser\'s; picture may not change with the new day.';
+   }
+   if (warning) {
+     $('#feedback').prepend($('<div class="alert alert-warning" role="alert">' +
+                              '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                              warning +
+                              '</div>'));
+   }
  });
  </script>
 </body>

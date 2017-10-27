@@ -69,12 +69,18 @@ router.get(['/', '/index.html', '/manage', '/manage.html'], function(req, res, n
   // change the current picture
   if (req.query.hasOwnProperty('switch') && pictures.switch(req.query.switch)) {
     let encoded = encodeHTML(pictures.current.file);
-    feedback.push(`Now showing ${encoded}.`);
+    feedback.push({ severity: 'success', message: `Switched to ${encoded}.` });
   }
 
   // reset the sequence
   if (req.query.hasOwnProperty('reset')) {
-    feedback.push('Picture sequence reset.');
+    feedback.push({ severity: 'success', message: 'Picture sequence reset.' });
+  }
+
+  // reload the pictures
+  if (req.query.hasOwnProperty('reload')) {
+    pictures.reload();
+    feedback.push({ severity: 'success', message: `Picture files reloaded (${pictures.length}).` });
   }
 
   // resume normal sequence
@@ -82,7 +88,7 @@ router.get(['/', '/index.html', '/manage', '/manage.html'], function(req, res, n
 
     if (pictures.current) {
       let encoded = encodeHTML(pictures.current.file);
-      feedback.push(`Resumed sequence with ${encoded}.`);
+      feedback.push({ severity: 'success', message: `Resumed sequence with ${encoded}.` });
     }
   }
 
@@ -101,15 +107,18 @@ router.get(['/', '/index.html', '/manage', '/manage.html'], function(req, res, n
   parts.push(manageHeader);
   parts.push(' <div class="container">\n');
 
+  let now = new Date();
+  parts.push(`  <div id="feedback" data-timezone="${now.getTimezoneOffset()}" data-time="${now.getTime()}"}>\n`);
   if (feedback.length > 0) {
     for (let i = 0; i < feedback.length; i++) {
-      parts.push(`  <div class="alert alert-info" role="alert">
-   <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-   ${feedback[i]}
-  </div>
+      parts.push(`   <div class="alert alert-${feedback[i].severity}" role="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    ${feedback[i].message}
+   </div>
 `);
     }
   }
+  parts.push('  </div>\n');
 
   if (pictures.length < 1) {
     parts.push('<p>No pictures in the frame yet; use <strong>Manage</strong> | <strong>Upload Pictures</strong> above to change that.</p>\n');
@@ -121,7 +130,7 @@ router.get(['/', '/index.html', '/manage', '/manage.html'], function(req, res, n
     let current = pictures.current;
     if (current) {
       let caption = formatCaption(current, 'showing now');
-      parts.push(`  <div class="row">
+      parts.push(`  <div class="row current">
      <div class="col-sm-${cols} picture current">
       <img src="/picture/current" />
       <p class="caption">${caption}</p>
@@ -131,7 +140,7 @@ router.get(['/', '/index.html', '/manage', '/manage.html'], function(req, res, n
 
     // other pictures in a grid below
     if (pictures.length > 1 || pictures.length === 1 && current == null) {
-      parts.push('  <div class="row">\n');
+      parts.push('  <div class="row other">\n');
       let rows = 1, col = 0;
       let sorted = pictures.sorted(sort);
       for (let i = 0; i < sorted.length; i++) {
@@ -144,9 +153,9 @@ router.get(['/', '/index.html', '/manage', '/manage.html'], function(req, res, n
           col = 0;
           rows++;
         }
-        parts.push(`   <div class="col-sm-${span} picture">\n`);
+        parts.push(`   <div class="col-sm-${span} picture other">\n`);
         let encoded = encodeURIComponent(sorted[i].file);
-        parts.push(`    <a href="?switch=${encoded}"><img src="/thumbnail/${encoded}" /></a>\n`);
+        parts.push(`    <a class="switch" title="click to switch" href="?switch=${encoded}"><img src="/thumbnail/${encoded}" /></a>\n`);
         let caption = formatCaption(sorted[i]);
         parts.push(`    <p class="caption">${caption}</p>\n`);
         parts.push('   </div>\n');
