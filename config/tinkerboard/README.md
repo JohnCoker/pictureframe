@@ -2,6 +2,8 @@
 
 The [Asus TinkerBoard](https://www.asus.com/us/Single-Board-Computer/Tinker-Board/)
 is a more powerful SBC than the Raspberry Pi, but setup is similar.
+In particular, the TinkerBoard supports 4K output, which makes it better for modern TVs.
+
 Basic familiarity with Linux will be helpful, but I've tried to give the exact commands needed here to make it easy
 to figure out what you need to do.
 
@@ -12,7 +14,8 @@ This package runs on the Debian Linux distro provided by Asus.
 ### 1.1. Install Linux
 
 Download from the [Asus Support page](https://www.asus.com/uk/supportonly/TInker%20Board2GB/HelpDesk_Download/)
-and burn the image to a microSDHC disk. Install the disk into the slot on the board.
+and burn the image to a microSDHC card.
+Insert the card into the slot on the bottom of the TinkerBoard.
 
 Plug the HDMI port into your TV and attach a keyboard and mouse to the USB ports.
 
@@ -62,11 +65,11 @@ curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
 sudo apt-get install -y nodejs
 ```
 
-### 2.2. Copy over this GitHub repo directory to the machine and set up the application:
+### 2.2. Copy and Build the Application
 
 Execute in a terminal:
 ```
-git clone 'http:https://github.com/JohnCoker/pictureframe.git'
+git clone 'https://github.com/JohnCoker/pictureframe.git'
 cd pictureframe
 npm install
 ```

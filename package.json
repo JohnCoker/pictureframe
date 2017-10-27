@@ -8,6 +8,11 @@
     "lint": "jshint index.js lib/*.js"
   },
   "author": "John Coker <john@jcsw.com> (http://johncoker.com/)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JohnCoker/pictureframe.git"
+  },
+  "homepage": "https://github.com/JohnCoker/pictureframe.git",
   "license": "ISC",
   "dependencies": {
     "cookie-parser": "^1.4.3",

@@ -24,7 +24,7 @@ day or because the user updated the picture from the manage page).
 
 ## Setting Up
 
-You need to use an SBC capable of running Node.js with an HDMI output. For recent TVs, you want
+You need to use an SBC capable of running Node.js 6+ with an HDMI output. For recent TVs, you want
 one capable of 4k (2160p) output, any frame rate. For older TVs, HD is fine (1080p).
 As far as disk space, you need enough for the OS and the pictures you want to upload.
 (This application requires only a few hundred Mb.)
