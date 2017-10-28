@@ -7,12 +7,12 @@ module.exports = {
   pictures: path.join(__dirname, '../pictures'),
 
   /**
-   * If true, PUT and DELETE is supported to upload and remove images.
+   * If true, POST, PUT and DELETE are supported to upload and remove images.
    */
   uploads: true,
 
   /**
-   * Allowed picture image extensions.
+   * Allowed picture image file extensions.
    */
   extensions: ['jpg', 'jpeg', 'png'],
 };
