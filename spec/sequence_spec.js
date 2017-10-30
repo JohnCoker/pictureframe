@@ -1,4 +1,5 @@
-const Sequence = require("../lib/sequence.js");
+const fs = require('fs'),
+      Sequence = require("../lib/sequence.js");
 
 describe("sequence", function() {
   describe("EPOCH", function() {
@@ -45,6 +46,15 @@ describe("sequence", function() {
         let s = Math.round(Math.random() * 59);
         expect(Sequence.dateToNumber(new Date(2017, 9, 19, h, m, s))).toBe(n0);
       }
+    });
+  });
+
+  describe("todayToNumber", function() {
+    it("must match today", function() {
+      let n = Sequence.todayToNumber();
+      expect(n).toBeDefined();
+      expect(n).toBeGreaterThan(0);
+      expect(n).toBe(Sequence.dateToNumber(new Date()));
     });
   });
 
@@ -133,6 +143,41 @@ describe("sequence", function() {
     });
   });
 
+  describe("set length", function() {
+    describe("longer", function() {
+      let seq = new Sequence(50);
+      it("setup", function() {
+        expect(seq.length).toBe(50);
+        expect(seq.increment).toBe(27);
+        expect(seq.initial).toBeGreaterThan(-1);
+        expect(seq.initial).toBeLessThan(50);
+      });
+      it("resize", function() {
+        seq.length = 100;
+        expect(seq.length).toBe(100);
+        expect(seq.increment).toBe(51);
+        expect(seq.initial).toBeGreaterThan(-1);
+        expect(seq.initial).toBeLessThan(100);
+      });
+    });
+    describe("shorter", function() {
+      let seq = new Sequence(121);
+      it("setup", function() {
+        expect(seq.length).toBe(121);
+        expect(seq.increment).toBe(61);
+        expect(seq.initial).toBeGreaterThan(-1);
+        expect(seq.initial).toBeLessThan(121);
+      });
+      it("resize", function() {
+        seq.length = 65;
+        expect(seq.length).toBe(65);
+        expect(seq.increment).toBe(33);
+        expect(seq.initial).toBeGreaterThan(-1);
+        expect(seq.initial).toBeLessThan(65);
+      });
+    });
+  });
+
   describe("reset", function() {
     for (let length = 3; length < 1000; length = Math.floor(length * 1.414)) {
       describe("length " + length, function() {
@@ -205,5 +250,41 @@ describe("sequence", function() {
         });
       });
     }
+  });
+
+  describe("save/load", function() {
+    const path = "/tmp/sequence.json";
+    it("prepare", function() {
+      if (fs.existsSync(path))
+        fs.unlink(path);
+    });
+
+    it("no file", function() {
+      let sequence = Sequence.loadConfig(path);
+      expect(sequence).not.toBeDefined();
+    });
+
+    let orig;
+    it("setup", function() {
+      let sequence = new Sequence(77);
+      orig = sequence.config;
+      expect(orig.length).toBe(77);
+      sequence.saveConfig(path);
+    });
+    it("load/save", function() {
+      let sequence = Sequence.loadConfig(path);
+      expect(sequence).toBeDefined();
+      expect(sequence.length).toBe(orig.length);
+      expect(sequence.increment).toBe(orig.increment);
+      expect(sequence.initial).toBe(orig.initial);
+      sequence.saveConfig();
+    });
+    it("reload", function() {
+      let sequence = Sequence.loadConfig(path);
+      expect(sequence).toBeDefined();
+      expect(sequence.length).toBe(orig.length);
+      expect(sequence.increment).toBe(orig.increment);
+      expect(sequence.initial).toBe(orig.initial);
+    });
   });
 });

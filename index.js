@@ -13,7 +13,8 @@ const path = require('path'),
       cookieParser = require('cookie-parser'),
       sharp = require('sharp'),
       config = require('./config/server.js'),
-      Pictures = require('./lib/pictures.js');
+      Pictures = require('./lib/pictures.js'),
+      Sequence = require('./lib/sequence.js');
 
 const app = express(),
       router = express.Router(),
@@ -24,9 +25,27 @@ app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(express.static(path.join(__dirname, '/public')));
 app.use(cookieParser());
 
-// set up picture state
+// set up picture manage
 const pictures = new Pictures(config);
 pictures.reload();
+pictures.saveHistory();
+
+// set up the sequence
+const sequenceFile = path.join(pictures.configDirectory, '/sequence.json'),
+      sequence = Sequence.loadConfig(sequenceFile) || new Sequence(pictures.length);
+sequence.length = pictures.length;
+sequence.saveConfig(sequenceFile);
+
+function todaysPicture() {
+  let i = sequence.index(Sequence.todayToNumber());
+  if (pictures.switch(pictures.byIndex(i))) {
+    pictures.saveHistory();
+    return true;
+  }
+  return false;
+}
+sequence.onNewDay(todaysPicture);
+todaysPicture();
 
 /*
  * The manage route shows a page with the current picture at the top and the other ones in a table below.
@@ -74,19 +93,21 @@ router.get(['/', '/index.html', '/manage', '/manage.html'], function(req, res, n
 
   // reset the sequence
   if (req.query.hasOwnProperty('reset')) {
+    sequence.reset();
+    todaysPicture();
     feedback.push({ severity: 'success', message: 'Picture sequence reset.' });
   }
 
   // reload the pictures
   if (req.query.hasOwnProperty('reload')) {
     pictures.reload();
+    todaysPicture();
     feedback.push({ severity: 'success', message: `Picture files reloaded (${pictures.length}).` });
   }
 
   // resume normal sequence
   if (req.query.hasOwnProperty('resume')) {
-
-    if (pictures.current) {
+    if (todaysPicture()) {
       let encoded = encodeHTML(pictures.current.file);
       feedback.push({ severity: 'success', message: `Resumed sequence with ${encoded}.` });
     }

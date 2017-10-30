@@ -1,4 +1,5 @@
 node_modules
 pictures/*.jpg
+pictures/.pictureframe
 tmp
 out

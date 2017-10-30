@@ -50,3 +50,6 @@ Don't accidentally remove the comma at the end of the line.
 It is assumed that nothing irretrievable is located on the server pictures directory and the server is not accessible
 on a public network. If either of these assumptions is false you may not want to use this program, at least not without
 taking further measures to secure it.
+
+If you do secure this, make sure the `.pictureframe` directory in the pictures directory exists and is writable to
+the user running the server process so that the sequence and history files can be written.
