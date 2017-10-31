@@ -22,24 +22,6 @@
    </div>
  </div>
 
- <div id="reset-dialog" class="modal fade" tabindex="-1" role="dialog">
-   <div class="modal-dialog modal-sm">
-     <div class="modal-content">
-       <div class="modal-header">
-         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-         <h4 class="modal-title">Reset Sequence</h4>
-       </div>
-       <div class="modal-body">
-         <p>Restart sequence, showing all pictures with equal likelyhood?</p>
-       </div>
-       <div class="modal-footer">
-         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-         <button type="button" class="btn btn-primary">Reset</button>
-       </div>
-     </div>
-   </div>
- </div>
-
  <script src="/js/jquery.min.js"></script>
  <script src="/js/bootstrap.min.js"></script>
  <script type="text/javascript">
@@ -62,16 +44,6 @@
    });
    $('#upload-dialog .btn-primary').on('click', function() {
      console.log('upload');
-   });
-
-   // reset sequence
-   $('#navbar a.reset').click(function(e) {
-     e.preventDefault();
-     $('#reset-dialog').modal();
-   });
-   $('#reset-dialog .btn-primary').on('click', function() {
-     console.log('reset');
-     window.location = '?reset';
    });
 
    // warn if server time is off

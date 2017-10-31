@@ -91,13 +91,6 @@ router.get(['/', '/index.html', '/manage', '/manage.html'], function(req, res, n
     feedback.push({ severity: 'success', message: `Switched to ${encoded}.` });
   }
 
-  // reset the sequence
-  if (req.query.hasOwnProperty('reset')) {
-    sequence.reset();
-    todaysPicture();
-    feedback.push({ severity: 'success', message: 'Picture sequence reset.' });
-  }
-
   // reload the pictures
   if (req.query.hasOwnProperty('reload')) {
     pictures.reload();

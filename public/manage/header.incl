@@ -43,7 +43,6 @@
       <ul class="dropdown-menu">
        <li><a class="upload" href="#">Upload Pictures</a></li>
        <li><a href="?resume">Resume Sequence</a></li>
-       <li><a class="reset" href="?reset">Reset Sequence</a></li>
        <li><a class="reload" href="?reload">Reload Pictures</a></li>
       </ul>
      </li>

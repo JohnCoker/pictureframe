@@ -92,13 +92,11 @@ describe("sequence", function() {
         let seq = new Sequence(0);
         expect(seq.length).toBe(0);
         expect(seq.increment).toBe(1);
-        expect(seq.initial).toBe(0);
       });
       it("config", function() {
-        let seq = new Sequence({ length: 0, increment: 30, initial: 99 });
+        let seq = new Sequence({ length: 0, increment: 30 });
         expect(seq.length).toBe(0);
         expect(seq.increment).toBe(30);
-        expect(seq.initial).toBe(0);
       });
     });
     describe("with length value", function() {
@@ -110,9 +108,7 @@ describe("sequence", function() {
           expect(seq.increment).toBe(13);
   
           expect(typeof seq.increment).toBe('number');
-          expect(seq.initial).toBeGreaterThan(-1);
-          expect(seq.initial).toBeLessThan(22);
-          expect(seq.config).toEqual({ length: 22, increment: 13, initial: seq.initial });
+          expect(seq.config).toEqual({ length: 22, increment: 13 });
         });
       }
     });
@@ -121,23 +117,17 @@ describe("sequence", function() {
         it("try " + (i + 1), function() {
           let seq = new Sequence({ length: 34 });
           expect(seq.length).toBe(34);
-  
           expect(seq.increment).toBe(19);
-  
-          expect(typeof seq.increment).toBe('number');
-          expect(seq.initial).toBeGreaterThan(-1);
-          expect(seq.initial).toBeLessThan(34);
-          expect(seq.config).toEqual({ length: 34, increment: 19, initial: seq.initial });
+          expect(seq.config).toEqual({ length: 34, increment: 19 });
         });
       }
     });
     describe("with full config", function() {
       it("object", function() {
-        let config = { length: 47, increment: 24, initial: 6 };
+        let config = { length: 47, increment: 24 };
         let seq = new Sequence(config);
         expect(seq.length).toBe(47);
         expect(seq.increment).toBe(24);
-        expect(seq.initial).toBe(6);
         expect(seq.config).toEqual(config);
       });
     });
@@ -149,15 +139,11 @@ describe("sequence", function() {
       it("setup", function() {
         expect(seq.length).toBe(50);
         expect(seq.increment).toBe(27);
-        expect(seq.initial).toBeGreaterThan(-1);
-        expect(seq.initial).toBeLessThan(50);
       });
       it("resize", function() {
         seq.length = 100;
         expect(seq.length).toBe(100);
         expect(seq.increment).toBe(51);
-        expect(seq.initial).toBeGreaterThan(-1);
-        expect(seq.initial).toBeLessThan(100);
       });
     });
     describe("shorter", function() {
@@ -165,40 +151,13 @@ describe("sequence", function() {
       it("setup", function() {
         expect(seq.length).toBe(121);
         expect(seq.increment).toBe(61);
-        expect(seq.initial).toBeGreaterThan(-1);
-        expect(seq.initial).toBeLessThan(121);
       });
       it("resize", function() {
         seq.length = 65;
         expect(seq.length).toBe(65);
         expect(seq.increment).toBe(33);
-        expect(seq.initial).toBeGreaterThan(-1);
-        expect(seq.initial).toBeLessThan(65);
       });
     });
-  });
-
-  describe("reset", function() {
-    for (let length = 3; length < 1000; length = Math.floor(length * 1.414)) {
-      describe("length " + length, function() {
-        let seq = new Sequence(length);
-        let orig = seq.config;
-        let first = seq.index(0);
-        it("setup", function() {
-          expect(seq.length).toBe(length);
-          expect(seq.initial).toBeGreaterThan(-1);
-          expect(seq.initial).toBeLessThan(length);
-          expect(seq.initial).toMatch(/^\d+$/);
-        });
-        it("reset", function() {
-          seq.reset();
-          expect(seq.length).toBe(length);
-          expect(seq.increment).toBe(orig.increment);
-          expect(seq.initial).not.toBe(orig.initial);
-          expect(seq.index(0)).not.toBe(first);
-        });
-      });
-    }
   });
 
   describe("index", function() {
@@ -207,15 +166,10 @@ describe("sequence", function() {
         let seq = new Sequence(length);
         it("setup", function() {
           expect(seq.length).toBe(length);
-
           expect(seq.increment).toBeGreaterThan(0);
           expect(seq.increment).toBeGreaterThan(length / 2 - 1);
           expect(seq.increment).toBeLessThan(length);
           expect(seq.increment).toMatch(/^\d+$/);
-
-          expect(seq.initial).toBeGreaterThan(-1);
-          expect(seq.initial).toBeLessThan(length);
-          expect(seq.initial).toMatch(/^\d+$/);
         });
         let counts = [];
         for (let i = 0; i < length; i++)
@@ -241,12 +195,6 @@ describe("sequence", function() {
           loop();
           for (let i = 0; i < length; i++)
             expect(counts[i]).toBe(2);
-        });
-        it("third loop", function() {
-          seq.reset();
-          loop();
-          for (let i = 0; i < length; i++)
-            expect(counts[i]).toBe(3);
         });
       });
     }
@@ -276,7 +224,6 @@ describe("sequence", function() {
       expect(sequence).toBeDefined();
       expect(sequence.length).toBe(orig.length);
       expect(sequence.increment).toBe(orig.increment);
-      expect(sequence.initial).toBe(orig.initial);
       sequence.saveConfig();
     });
     it("reload", function() {
@@ -284,7 +231,6 @@ describe("sequence", function() {
       expect(sequence).toBeDefined();
       expect(sequence.length).toBe(orig.length);
       expect(sequence.increment).toBe(orig.increment);
-      expect(sequence.initial).toBe(orig.initial);
     });
   });
 });

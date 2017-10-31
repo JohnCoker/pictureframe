@@ -3,3 +3,5 @@ pictures/*.jpg
 pictures/.pictureframe
 tmp
 out
+logs
+pid
