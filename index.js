@@ -65,7 +65,7 @@ function formatCaption(picture, when) {
       midnight.setHours(0, 0, 0, 0);
       let ago = 0;
       while (picture.lastShown < midnight) {
-        midnight.setDate(midnight.getDate(-1));
+        midnight.setDate(midnight.getDate() - 1);
         ago++;
       }
   
