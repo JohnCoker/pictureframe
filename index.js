@@ -8,6 +8,7 @@ const path = require('path'),
       fs = require('fs'),
       express = require('express'),
       favicon = require('serve-favicon'),
+      multer = require('multer'),
       SSE = require('express-sse'),
       logger = require('morgan'),
       cookieParser = require('cookie-parser'),
@@ -81,6 +82,11 @@ function formatCaption(picture, when) {
   return encodeHTML(picture.file) + ', ' + when;
 }
 
+function reloadPictures() {
+  pictures.reload();
+  todaysPicture();
+}
+
 router.get(['/', '/index.html', '/manage', '/manage.html'], function(req, res, next) {
 
   var feedback = [];
@@ -93,8 +99,7 @@ router.get(['/', '/index.html', '/manage', '/manage.html'], function(req, res, n
 
   // reload the pictures
   if (req.query.hasOwnProperty('reload')) {
-    pictures.reload();
-    todaysPicture();
+    reloadPictures();
     feedback.push({ severity: 'success', message: `Picture files reloaded (${pictures.length}).` });
   }
 
@@ -285,6 +290,139 @@ router.get(['/sse', '/sse.html'], sse.init);
 
 pictures.on('switch', function(cur) {
   sse.send(cur == null ? "none" : cur.file, 'switch');
+});
+
+/*
+ * POST to /upload will upload a set of files.
+ */
+function noUploadResponse(res) {
+  res.status(403).send('Picture upload not supported.');
+}
+
+function badExtensionResponse(res) {
+  res.status(400).send('Picture file extension not supported.');
+}
+
+function errorResponse(res, err) {
+  if (err != null && err.code == 'EACCES')
+    res.status(403).send('Permission Denied.');
+  else
+    res.status(500).send(e);
+}
+
+const upload = multer({
+  dest: '/tmp',
+});
+
+router.post('/upload', upload.array('upload'), function(req, res, next) {
+  if (!config.uploads) {
+    noUploadResponse(res);
+    return;
+  }
+
+  if (req.files == null || req.files.length < 1) {
+    res.status(400).send('No files to upload.');
+    return;
+  }
+  const total = req.files.length;
+
+  let success = 0, failed = 0;
+  let firstFile;
+  for (let i = 0; i < total; i++) {
+    let upload = req.files[i];
+
+    let file = upload.originalname;
+    if (!firstFile)
+      firstFile = file;
+    let ext = file.replace(/^.*\.([a-z]*)$/i, '$1').toLowerCase();
+    if (ext === '' || config.extensions.indexOf(ext) < 0) {
+      if (total == 1) {
+        badExtensionResponse(res);
+        return;
+      }
+      failed++;
+      continue;
+    }
+
+    let p = path.join(pictures.directory, '/', file);
+    try {
+      fs.renameSync(upload.path, p);
+      success++;
+    } catch (err) {
+      failed++;
+      fs.unlink(upload.path);
+    }
+  }
+
+  if (total == 1 && failed > 0)
+    res.status(400).send('File upload failed (' + firstFile + ').');
+  else if (total == 1)
+    res.status(200).send('File upload succeeded (' + firstFile + ').');
+  else if (failed > 0 && succeeded > 0)
+    res.status(400).send(failed + ' file uploads failed.');
+  else if (failed > 0)
+    res.status(200).send(success + '/' + total + ' file uploads succeeded.');
+  else
+    res.status(200).send(success + ' file uploads succeeded.');
+
+  if (success > 0)
+    reloadPictures();
+});
+
+/*
+ * PUT to /picture/* will create/update a file.
+ */
+router.put('/picture/:file', function(req, res, next) {
+  if (!config.uploads) {
+    noUploadResponse(res);
+    return;
+  }
+
+  let file = req.params.file.replace(/^[^\/]*\//, '');
+  let ext = file.replace(/^.*\.([a-z]*)$/i, '$1').toLowerCase();
+  if (ext === '' || config.extensions.indexOf(ext) < 0) {
+    badExtensionResponse(res);
+    return;
+  }
+
+  let data = new Buffer('');
+  req.on('data', function(chunk) {
+    data = Buffer.concat([data, chunk]);
+  }).on('end', function() {
+    let p = path.join(pictures.directory, '/', file);
+    fs.writeFile(p, data, function(err) {
+      if (err)
+        errorResponse(res, err);
+      else
+        res.status(201).send();
+      reloadPictures();
+    });
+  }).on('error', function(err) {
+    errorResponse(res, err);
+  });
+});
+
+/*
+ * DELETE of /picture/* will remove a file.
+ */
+router.delete('/picture/:file', function(req, res, next) {
+  if (!config.uploads) {
+    noUploadResponse(res);
+    return;
+  }
+
+  let p = pictures.byFile(req.params.file);
+  if (p == null) {
+    errorResponse(res, err);
+    return;
+  }
+  fs.unlink(p.path, function(err) {
+    if (err)
+      errorResponse(res, err);
+    else
+      res.status(200).send();
+    reloadPictures();
+  });
 });
 
 app.use('/', router);

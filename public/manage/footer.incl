@@ -7,7 +7,7 @@
          <h4 class="modal-title">Upload Pictures</h4>
        </div>
        <div class="modal-body">
-         <form method="POST" action="/upload">
+         <form method="POST" action="/upload" enctype="multipart/form-data">
           <label class="btn btn-default btn-file">
             Browse <input type="file" name="upload" id="upload" multiple style="display: none;" />
           </label>
@@ -27,6 +27,19 @@
  <script type="text/javascript">
  $(document).ready(function() {
 
+   function feedback(status, message) {
+     if (message == null)
+       return;
+     message = message.toString();
+     message = message.replace(/&/g, '&amp;')
+                      .replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;');
+     $('#feedback').prepend($('<div class="alert alert-' + status + '" role="alert">' +
+                              '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                              message +
+                              '</div>'));
+   }
+
    // picture upload
    $('#navbar a.upload').click(function(e) {
      e.preventDefault();
@@ -42,8 +55,27 @@
        input.closest('.modal').find('.modal-footer .btn-primary').prop('disabled', false);
      }
    });
-   $('#upload-dialog .btn-primary').on('click', function() {
-     console.log('upload');
+   $('#upload-dialog .btn-primary').on('click', function(e) {
+     e.preventDefault();
+     $(this).prop('disabled', true);
+
+     var dialog = $(this).closest('.modal');
+     var form = dialog.find('form');
+     $.ajax({
+       type: form.attr('method'),
+       url: form.attr('action'),
+       contentType: false,
+       data: new FormData(form[0]),
+       processData: false,
+       success: function(data) {
+         feedback('success', data);
+         dialog.modal('hide');
+       },
+       error: function(data) {
+         feedback('danger', data.responseText || 'Upload failed!');
+         dialog.modal('hide');
+       },
+     });
    });
 
    // warn if server time is off
@@ -56,10 +88,7 @@
      warning = 'Server time is different from your browser\'s; picture may not change with the new day.';
    }
    if (warning) {
-     $('#feedback').prepend($('<div class="alert alert-warning" role="alert">' +
-                              '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-                              warning +
-                              '</div>'));
+     feedback('warning', warning);
    }
  });
  </script>
