@@ -1,7 +1,7 @@
 # Picture Frame
 
 This repository contains the code that supports using a
-[single-board computer](https://en.wikipedia.org/wiki/Single-board_computer)
+[single-board computer](https://en.wikipedia.org/wiki/Single-board_computer) (SBC)
 to drive a TV for use as a picture frame.
 In particular, it shows a different picture each day from the collection of photos you upload.
 
