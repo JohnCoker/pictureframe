@@ -53,3 +53,20 @@ taking further measures to secure it.
 
 If you do secure this, make sure the `.pictureframe` directory in the pictures directory exists and is writable to
 the user running the server process so that the sequence and history files can be written.
+
+## Uploading Images Programmatically
+
+The easiest way to put pictures onto the server is to use `scp`, but it is also possible to use
+the web server methods PUT and DELETE. The path for either method is `/picture/`_file_ where the
+_file_ must have an extension that matches those configured (see above). The body should be the
+single file content (no form encoding).
+
+For example, if you named your SBC "pictureframe", from a Mac on your local network you might use
+cURL to upload a file:
+```
+curl -X PUT 'http://pictureframe.local/picture/landscape.jpg' --upload-file landscape.jpg
+```
+Note that the file name in the URL will be the name under which the picture is stored, regardless
+of the file from which the data is read. An existing file with the same name will be overwritten.
+
+If uploads are disabled (see above), PUT and DELETE will be disabled as well.

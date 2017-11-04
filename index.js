@@ -87,6 +87,15 @@ function reloadPictures() {
   todaysPicture();
 }
 
+function template(source, params) {
+  return source.replace(/{{ *([a-z]+) *}}/g, function(m, v) {
+    if (params.hasOwnProperty(v))
+      return params[v];
+    else
+      return '';
+  });
+}
+
 router.get(['/', '/index.html', '/manage', '/manage.html'], function(req, res, next) {
 
   var feedback = [];
@@ -121,13 +130,30 @@ router.get(['/', '/index.html', '/manage', '/manage.html'], function(req, res, n
     sort = req.cookies.sort;
   }
 
+  // parameters available for the template
+  let now = new Date();
+  let params = {
+    timezone: now.getTimezoneOffset(),
+    time: now.getTime(),
+    uploads: config.uploads,
+  };
+  if (config.uploads) {
+    let es = "";
+    config.extensions.forEach(function(e) {
+      if (es.length > 0)
+        es += ',';
+      es += '.' + e;
+    });
+    params.accept = es;
+  }
+  console.log(params);
+
   // generate the page
   var parts = [];
-  parts.push(manageHeader);
+  parts.push(template(manageHeader, params));
   parts.push(' <div class="container">\n');
 
-  let now = new Date();
-  parts.push(`  <div id="feedback" data-timezone="${now.getTimezoneOffset()}" data-time="${now.getTime()}"}>\n`);
+  parts.push(`  <div id="feedback">\n`);
   if (feedback.length > 0) {
     for (let i = 0; i < feedback.length; i++) {
       parts.push(`   <div class="alert alert-${feedback[i].severity}" role="alert">
@@ -190,7 +216,7 @@ router.get(['/', '/index.html', '/manage', '/manage.html'], function(req, res, n
   }
 
   parts.push(' </div>\n');
-  parts.push(manageFooter);
+  parts.push(template(manageFooter, params));
 
   res.status(200)
      .type('html');
@@ -299,6 +325,10 @@ function noUploadResponse(res) {
   res.status(403).send('Picture upload not supported.');
 }
 
+function noSuchFileResponse(res) {
+  res.status(404).send('File does not exist.');
+}
+
 function badExtensionResponse(res) {
   res.status(400).send('Picture file extension not supported.');
 }
@@ -306,8 +336,10 @@ function badExtensionResponse(res) {
 function errorResponse(res, err) {
   if (err != null && err.code == 'EACCES')
     res.status(403).send('Permission Denied.');
+  else if (err != null && err.code == 'ENOENT')
+    res.status(404).send('No such file or directory.');
   else
-    res.status(500).send(e);
+    res.status(500).send(err);
 }
 
 const upload = multer({
@@ -358,7 +390,7 @@ router.post('/upload', upload.array('upload'), function(req, res, next) {
     res.status(400).send('File upload failed (' + firstFile + ').');
   else if (total == 1)
     res.status(200).send('File upload succeeded (' + firstFile + ').');
-  else if (failed > 0 && succeeded > 0)
+  else if (failed > 0 && success < 1)
     res.status(400).send(failed + ' file uploads failed.');
   else if (failed > 0)
     res.status(200).send(success + '/' + total + ' file uploads succeeded.');
@@ -370,7 +402,7 @@ router.post('/upload', upload.array('upload'), function(req, res, next) {
 });
 
 /*
- * PUT to /picture/* will create/update a file.
+ * PUT of /picture/* will create/update a file.
  */
 router.put('/picture/:file', function(req, res, next) {
   if (!config.uploads) {
@@ -413,7 +445,7 @@ router.delete('/picture/:file', function(req, res, next) {
 
   let p = pictures.byFile(req.params.file);
   if (p == null) {
-    errorResponse(res, err);
+    noSuchFileResponse(res);
     return;
   }
   fs.unlink(p.path, function(err) {

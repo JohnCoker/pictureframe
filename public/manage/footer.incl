@@ -9,7 +9,7 @@
        <div class="modal-body">
          <form method="POST" action="/upload" enctype="multipart/form-data">
           <label class="btn btn-default btn-file">
-            Browse <input type="file" name="upload" id="upload" multiple style="display: none;" />
+            Browse <input type="file" name="upload" id="upload" multiple style="display: none;" accept="{{accept}}" />
           </label>
           &nbsp;<span class="feedback">(select image files)</span>
          </form>
@@ -41,46 +41,50 @@
    }
 
    // picture upload
-   $('#navbar a.upload').click(function(e) {
-     e.preventDefault();
-     $('#upload-dialog .btn-primary').prop('disabled', true);
-     $('#upload-dialog').modal();
-   });
-   $('#upload-dialog :file').on('change', function() {
-     var input = $(this),
-         count = input.get(0).files ? input.get(0).files.length : 1,
-         name = input.val().replace(/\\/g, '/').replace(/.*\//, '');
-     if (count > 0) {
-       input.closest('form').find('.feedback').text(count == 1 ? name : count + ' files selected');
-       input.closest('.modal').find('.modal-footer .btn-primary').prop('disabled', false);
-     }
-   });
-   $('#upload-dialog .btn-primary').on('click', function(e) {
-     e.preventDefault();
-     $(this).prop('disabled', true);
-
-     var dialog = $(this).closest('.modal');
-     var form = dialog.find('form');
-     $.ajax({
-       type: form.attr('method'),
-       url: form.attr('action'),
-       contentType: false,
-       data: new FormData(form[0]),
-       processData: false,
-       success: function(data) {
-         feedback('success', data);
-         dialog.modal('hide');
-       },
-       error: function(data) {
-         feedback('danger', data.responseText || 'Upload failed!');
-         dialog.modal('hide');
-       },
+   if ({{uploads}}) {
+     $('#navbar a.upload').click(function(e) {
+       e.preventDefault();
+       $('#upload-dialog .btn-primary').prop('disabled', true);
+       $('#upload-dialog').modal();
      });
-   });
+     $('#upload-dialog :file').on('change', function() {
+       var input = $(this),
+           count = input.get(0).files ? input.get(0).files.length : 1,
+           name = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+       if (count > 0) {
+         input.closest('form').find('.feedback').text(count == 1 ? name : count + ' files selected');
+         input.closest('.modal').find('.modal-footer .btn-primary').prop('disabled', false);
+       }
+     });
+     $('#upload-dialog .btn-primary').on('click', function(e) {
+       e.preventDefault();
+       $(this).prop('disabled', true);
+  
+       var dialog = $(this).closest('.modal');
+       var form = dialog.find('form');
+       $.ajax({
+         type: form.attr('method'),
+         url: form.attr('action'),
+         contentType: false,
+         data: new FormData(form[0]),
+         processData: false,
+         success: function(data) {
+           feedback('success', data);
+           dialog.modal('hide');
+         },
+         error: function(data) {
+           feedback('danger', data.responseText || 'Upload failed!');
+           dialog.modal('hide');
+         },
+       });
+     });
+   } else {
+     $('#navbar a.upload').closest('li').hide();
+   }
 
    // warn if server time is off
-   var serverOffset = $('#feedback').data('timezone');
-   var serverTime = $('#feedback').data('time');
+   var serverOffset = {{timezone}};
+   var serverTime = {{time}};
    var warning;
    if (typeof serverOffset == 'number' && serverOffset != new Date().getTimezoneOffset()) {
      warning = 'Server time zone is different from your browser\'s; picture may not change with the new day.';
