@@ -5,6 +5,8 @@ This repository contains the code that supports using a
 to drive a TV for use as a picture frame.
 In particular, it shows a different picture each day from the collection of photos you upload.
 
+[![Build Status](https://travis-ci.org/JohnCoker/pictureframe.svg?branch=master)](https://travis-ci.org/JohnCoker/pictureframe)
+
 ## Architecture
 
 The picture frame is implemented with a single [Node.js](https://en.wikipedia.org/wiki/Node.js)
