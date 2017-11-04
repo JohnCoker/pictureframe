@@ -42,7 +42,7 @@ As far as disk space, you need enough for the OS and the pictures you want to up
 
 6. Connect to the SBC's web interface from your computer or phone to manage it.
 
-See detailed instructions for individual SBCs in the `config` directory.
+See detailed instructions plus step-by-step guides for individual SBCs in the `config` directory.
 
 ## Why?
 
@@ -91,3 +91,8 @@ To play with it, locally:
  - `bin/www`
  - browse to `http://localhost:3000/`
  - open another tab to `http://localhost:3000/frame.html`
+
+## License
+
+This software is licensed under the [ISC license](https://opensource.org/licenses/ISC).
+Feel free to use parts of it in your own projects with proper attribution.

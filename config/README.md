@@ -38,11 +38,15 @@ This may result in black bars or part of the image being cut off on the left and
 
 Older TVs will have an "HD" resolution of 1920×1080 (1080p) and modern TVs will have a "4K"
 resolution of 3840×2160 (2160p). See [4K resolution](https://en.wikipedia.org/wiki/4K_resolution)
-for information.
+for more information.
 
 Note that many TVs will not display the outer edges of the image so make sure important details
 are not at the very edge. This is generally not a problem for natural images, but can noticeably
 affect graphic art.
+
+If you want to color-correct your images, TVs support at least "Rec. 709" (HDTV)
+and newer 4K TVs support WCG and 10-bit color.
+However, if you're going that far I suggest checking the specs of the TV/monitor you plan to use.
 
 ## Security Warning
 
