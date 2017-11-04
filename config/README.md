@@ -32,6 +32,18 @@ Only pictures located directly in the pictures directory are scanned; sub-direct
 Any file that ends with one of the extensions specified in `server.js` is assumed to be a picture image.
 File extensions should be specified as lower-case, but are case-insensitive when comparing file names.
 
+It is best to resize and crop your images to the resolution of the TV. The picture frame will
+maintain the aspect ratio of the original image so that the picture fills the screen vertically.
+This may result in black bars or part of the image being cut off on the left and right.
+
+Older TVs will have an "HD" resolution of 1920×1080 (1080p) and modern TVs will have a "4K"
+resolution of 3840×2160 (2160p). See [4K resolution](https://en.wikipedia.org/wiki/4K_resolution)
+for information.
+
+Note that many TVs will not display the outer edges of the image so make sure important details
+are not at the very edge. This is generally not a problem for natural images, but can noticeably
+affect graphic art.
+
 ## Security Warning
 
 The web server is accessed without a password, so any picture files located in the configured directory are
