@@ -100,27 +100,23 @@ describe("sequence", function() {
       });
     });
     describe("with length value", function() {
-      for (let i = 0; i < 100; i++) {
-        it("try " + (i + 1), function() {
-          let seq = new Sequence(22);
-          expect(seq.length).toBe(22);
+      it("setup", function() {
+        let seq = new Sequence(22);
+        expect(seq.length).toBe(22);
   
-          expect(seq.increment).toBe(13);
+        expect(seq.increment).toBe(1);
   
-          expect(typeof seq.increment).toBe('number');
-          expect(seq.config).toEqual({ length: 22, increment: 13 });
-        });
-      }
+        expect(typeof seq.increment).toBe('number');
+        expect(seq.config).toEqual({ length: 22, increment: 1 });
+      });
     });
     describe("with config length only", function() {
-      for (let i = 0; i < 100; i++) {
-        it("try " + (i + 1), function() {
-          let seq = new Sequence({ length: 34 });
-          expect(seq.length).toBe(34);
-          expect(seq.increment).toBe(19);
-          expect(seq.config).toEqual({ length: 34, increment: 19 });
-        });
-      }
+      it("setup", function() {
+        let seq = new Sequence({ length: 34 });
+        expect(seq.length).toBe(34);
+        expect(seq.increment).toBe(3);
+        expect(seq.config).toEqual({ length: 34, increment: 3 });
+      });
     });
     describe("with full config", function() {
       it("object", function() {
@@ -138,24 +134,24 @@ describe("sequence", function() {
       let seq = new Sequence(50);
       it("setup", function() {
         expect(seq.length).toBe(50);
-        expect(seq.increment).toBe(27);
+        expect(seq.increment).toBe(3);
       });
       it("resize", function() {
         seq.length = 100;
         expect(seq.length).toBe(100);
-        expect(seq.increment).toBe(51);
+        expect(seq.increment).toBe(7);
       });
     });
     describe("shorter", function() {
       let seq = new Sequence(121);
       it("setup", function() {
         expect(seq.length).toBe(121);
-        expect(seq.increment).toBe(61);
+        expect(seq.increment).toBe(5);
       });
       it("resize", function() {
         seq.length = 65;
         expect(seq.length).toBe(65);
-        expect(seq.increment).toBe(33);
+        expect(seq.increment).toBe(3);
       });
     });
   });
@@ -167,7 +163,6 @@ describe("sequence", function() {
         it("setup", function() {
           expect(seq.length).toBe(length);
           expect(seq.increment).toBeGreaterThan(0);
-          expect(seq.increment).toBeGreaterThan(length / 2 - 1);
           expect(seq.increment).toBeLessThan(length);
           expect(seq.increment).toMatch(/^\d+$/);
         });
