@@ -130,6 +130,7 @@ describe("pictures", function() {
     it("setup", function() {
       pictures = new Pictures(SAMPLES);
       pictures.reload();
+      pictures.switch(pictures.byIndex(0));
     });
     it("save 1", function() {
       pictures.saveHistory();
@@ -197,6 +198,7 @@ describe("pictures", function() {
         events.push(p);
       });
       pictures.reload();
+      pictures.switch(pictures.byIndex(0));
     });
     it("initial event", function() {
       expect(events.length).toBe(1);
