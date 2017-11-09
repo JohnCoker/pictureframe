@@ -109,14 +109,17 @@ edit `~/.config/lxsession/LXDE/autostart` to look like this:
 @pcmanfm --desktop --profile LXDE
 # @xscreensaver -no-splash
 
+@xrandr --output HDMI-1 --mode 3840x2160 --rate 30
 @xset s off
 @xset -dpms
 @xset s noblank
 @sed -i 's/"exited_cleanly": false/"exited_cleanly": true/' ~/.config/chromium/Default/Preferences
-@unclutter -idle 0
+@unclutter -idle 1
 @chromium --noerrdialogs --kiosk http://localhost/frame.html
 ```
 (Remove or comment out the "@xscreensaver" line and add the lines starting with "@xset".)
+
+Note that the line starting with "@xrandr" sets the display resolution to 4K (3840x2160).
 
 ## 4. Reboot
 
