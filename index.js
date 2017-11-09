@@ -177,7 +177,7 @@ router.get(['/', '/index.html', '/manage', '/manage.html'], function(req, res, n
       let caption = formatCaption(current, 'showing now');
       parts.push(`  <div class="row current">
      <div class="col-sm-${cols} picture current">
-      <img src="/picture/current" />
+      <img src="/picture/current?d=${Sequence.todayToNumber()}" />
       <p class="caption">${caption}</p>
      </div>
     </div>\n`);
