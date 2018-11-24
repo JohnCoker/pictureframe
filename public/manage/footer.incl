@@ -12,6 +12,7 @@
             Browse <input type="file" name="upload" id="upload" multiple style="display: none;" accept="{{accept}}" />
           </label>
           &nbsp;<span class="feedback">(select image files)</span>
+          <progress name="progress" max="100" value="0" style="width: 99%">0%</progress>
          </form>
        </div>
        <div class="modal-footer">
@@ -44,6 +45,9 @@
    if ({{uploads}}) {
      $('#navbar a.upload').click(function(e) {
        e.preventDefault();
+       $('#upload-dialog :file').val('');
+       $('#upload-dialog .feedback').text('(select image files)');
+       $('#upload-dialog progress').val(0);
        $('#upload-dialog .btn-primary').prop('disabled', true);
        $('#upload-dialog').modal();
      });
@@ -62,13 +66,28 @@
   
        var dialog = $(this).closest('.modal');
        var form = dialog.find('form');
+       form.find('progress').val(0);
+       function progress(e) {
+         var pct;
+         if (e.lengthComputable && e.loaded > 0 && e.total > 0) {
+           pct = (100.0 * e.loaded / e.total).toFixed();
+           form.find('progress').val(pct);
+         }
+       }
        $.ajax({
+         xhr: function () {
+           var xhr = new window.XMLHttpRequest();
+           xhr.upload.addEventListener("progress", progress, false);
+           xhr.addEventListener("progress", progress, false);
+           return xhr;
+         },
          type: form.attr('method'),
          url: form.attr('action'),
          contentType: false,
          data: new FormData(form[0]),
          processData: false,
          success: function(data) {
+           form.find('progress').val(100);
            feedback('success', data);
            dialog.modal('hide');
          },
