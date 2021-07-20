@@ -146,7 +146,6 @@ router.get(['/', '/index.html', '/manage', '/manage.html'], function(req, res, n
     });
     params.accept = es;
   }
-  console.log(params);
 
   // generate the page
   var parts = [];

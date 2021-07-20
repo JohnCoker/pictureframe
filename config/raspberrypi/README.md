@@ -1,4 +1,4 @@
-# Setup on Raspberry Pi 3
+# Setup on Raspberry Pi 4B
 
 The [Raspberry Pi](https://www.raspberrypi.org/) is a popular line of single-board computers that can run a variety of
 operating systems.
@@ -12,7 +12,7 @@ This package runs on the Debian Linux distro named "Raspbian" provided by Raspbe
 ### 1.1. Install Linux
 
 Download from the [Raspoberry Pi Downloads page](https://www.raspberrypi.org/downloads/raspbian/)
-the "Raspbian Stretch with Desktop" and burn the image to a microSDHC card.
+the "Raspberry Pi OS with Desktop" and burn the image to a microSDHC card.
 Insert the card into the slot on the bottom of the Pi.
 
 Plug the HDMI port into your TV and attach a keyboard and mouse to the USB ports.
@@ -56,7 +56,7 @@ hostname on the *System* tab.
 ### 1.5 Display Resolution
 
 While there on the *System* tab, make sure the resolution is correct for your TV.
-This will generally be "1920x1080 60Hz" (1080p).
+This will generally be "3840×2160 60Hz" (4K).
 
 ## 2. Install the Server
 
@@ -68,7 +68,7 @@ The server needs at least version 6 of node (with ES6 support). Check which vers
 with `node --version`. If this prints out anything less than v6.11.0, upgrade to something less ancient.
 Execute in a terminal:
 ```
-curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
 sudo apt install nodejs
 ```
 
@@ -109,13 +109,15 @@ sudo apt-get install unclutter
 
 ### 3.2. Start Chromium Kiosk
 
-[From these instructions](https://www.danpurdy.co.uk/web-development/raspberry-pi-kiosk-screen-tutorial/),
+[From these instructions](https://www.danpurdy.co.uk/web-development/raspberry-pi-kiosk-screen-tutorial/):
+```
+mkdir -p ~/.config/lxsession/LXDE-pi
+```
+
 edit `~/.config/lxsession/LXDE-pi/autostart` to look like this:
 ```
 @lxpanel --profile LXDE-pi
 @pcmanfm --desktop --profile LXDE-pi
-# @xscreensaver -no-splash
-# @point-rpi
 
 @xset s off
 @xset -dpms
@@ -124,7 +126,7 @@ edit `~/.config/lxsession/LXDE-pi/autostart` to look like this:
 @unclutter -idle 0
 @/usr/lib/chromium-browser/chromium-browser --noerrdialogs --kiosk http://localhost/frame.html
 ```
-(Remove or comment out the "@xscreensaver" and "@point-rpi" lines and add the lines starting with "@xset".)
+(Remove or comment out the "@xscreensaver" and "@point-rpi" lines if any and add the lines starting with "@xset".)
 
 ## 4. Reboot
 
