@@ -176,7 +176,7 @@ router.get(['/', '/index.html', '/manage', '/manage.html'], function(req, res, n
       let caption = formatCaption(current, 'showing now');
       parts.push(`  <div class="row current">
      <div class="col-sm-${cols} picture current">
-      <img src="/picture/current?d=${Sequence.todayToNumber()}" />
+      <img src="/picture/current?d=${Sequence.todayToNumber()}&r=${pictures.reloads}" />
       <p class="caption">${caption}</p>
      </div>
     </div>\n`);
@@ -241,7 +241,7 @@ router.get(['/picture/current', '/thumbnail/current'], function(req, res, next) 
       cacheControl: false,
       headers: {
         'Last-Modified': pictures.current.lastShown.toUTCString(),
-        'Cache-Control': 'must-revalidate',
+        'Cache-Control': 'no-cache',
         'X-Current-Picture': pictures.current.file
       }
     });
