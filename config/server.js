@@ -15,4 +15,9 @@ module.exports = {
    * Allowed picture image file extensions.
    */
   extensions: ['jpg', 'jpeg', 'png'],
+
+  /**
+   * Name displayed in the title of the "manage" page.
+   */
+  name: 'Picture Frame',
 };

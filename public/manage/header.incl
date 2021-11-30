@@ -25,7 +25,7 @@
      <img src="/images/header-icon.png" width="50" height="50" />
     </a>
     <a class="navbar-brand hidden-xs" href="https://github.com/JohnCoker/pictureframe">
-     <h1>Picture Frame</h1>
+     <h1>{{name}}</h1>
     </a>
    </div>
    <div id="navbar" class="collapse navbar-collapse navbar-right">

@@ -136,6 +136,7 @@ router.get(['/', '/index.html', '/manage', '/manage.html'], function(req, res, n
     timezone: now.getTimezoneOffset(),
     time: now.getTime(),
     uploads: config.uploads,
+    name: config.name || 'Picture Frame',
   };
   if (config.uploads) {
     let es = "";
