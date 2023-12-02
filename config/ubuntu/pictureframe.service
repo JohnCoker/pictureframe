@@ -1,0 +1,16 @@
+[Unit]
+Description=Node.js Picture Frame Server
+
+[Service]
+ExecStart=/usr/bin/node /home/pictureframe/pictureframe/bin/www
+# Required on some systems
+WorkingDirectory=/home/pictureframe/pictureframe
+Restart=always
+RestartSec=10
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=nodejs-example
+Environment=NODE_ENV=production PORT=80
+
+[Install]
+WantedBy=multi-user.target
