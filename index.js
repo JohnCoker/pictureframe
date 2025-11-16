@@ -33,7 +33,7 @@ pictures.saveHistory();
 
 // set up the sequence
 const sequenceFile = path.join(pictures.configDirectory, '/sequence.json'),
-      sequence = Sequence.loadConfig(sequenceFile) || new Sequence(pictures.length);
+      sequence = Sequence.loadConfig(sequenceFile, pictures) || new Sequence(pictures.length);
 sequence.length = pictures.length;
 sequence.saveConfig(sequenceFile);
 
@@ -116,18 +116,32 @@ router.get(['/', '/index.html', '/manage', '/manage.html'], function(req, res, n
   if (req.query.hasOwnProperty('resume')) {
     if (todaysPicture()) {
       let encoded = encodeHTML(pictures.current.file);
-      feedback.push({ severity: 'success', message: `Resumed sequence with ${encoded}.` });
+      feedback.push({ severity: 'success', message: `Resumed sequence (${sequence.selector}) with ${encoded}.` });
     }
   }
 
   // collect the sort order
   let sort;
   if (req.query.hasOwnProperty('sort') &&
-      /^(name|shown|updated)$/.test(req.query.sort.toLowerCase())) {
+      /^-?(name|shown|updated)$/.test(req.query.sort.toLowerCase())) {
     sort = req.query.sort;
     res.append('Set-Cookie', 'sort=' + sort);
   } else {
     sort = req.cookies.sort;
+  }
+
+  // collect the selection style
+  let select;
+  if (req.query.hasOwnProperty('select') &&
+      /^(rotate|random|unshown)$/.test(req.query.select.toLowerCase())) {
+    select = req.query.select;
+    res.append('Set-Cookie', 'select=' + select);
+  } else {
+    select = req.cookies.select;
+  }
+  if (select != null && select != sequence.selector) {
+    sequence.selector = select;
+    sequence.saveConfig(sequenceFile);
   }
 
   // parameters available for the template

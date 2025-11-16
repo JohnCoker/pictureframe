@@ -1,5 +1,12 @@
 const fs = require('fs'),
-      Sequence = require("../lib/sequence.js");
+      { execSync } = require('child_process'),
+      Sequence = require("../lib/sequence.js"),
+      Pictures = require("../lib/pictures.js"),
+      { SAMPLES, clearConfig } = require("./samples.js");
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 describe("sequence", function() {
   describe("EPOCH", function() {
@@ -94,7 +101,7 @@ describe("sequence", function() {
         expect(seq.increment).toBe(1);
       });
       it("config", function() {
-        let seq = new Sequence({ length: 0, increment: 30 });
+        let seq = new Sequence({ length: 0, increment: 30, selector: 'rotate' });
         expect(seq.length).toBe(0);
         expect(seq.increment).toBe(30);
       });
@@ -103,11 +110,11 @@ describe("sequence", function() {
       it("setup", function() {
         let seq = new Sequence(22);
         expect(seq.length).toBe(22);
-  
+
         expect(seq.increment).toBe(1);
-  
+
         expect(typeof seq.increment).toBe('number');
-        expect(seq.config).toEqual({ length: 22, increment: 1 });
+        expect(seq.config).toEqual({ length: 22, increment: 1, selector: 'rotate' });
       });
     });
     describe("with config length only", function() {
@@ -115,16 +122,27 @@ describe("sequence", function() {
         let seq = new Sequence({ length: 34 });
         expect(seq.length).toBe(34);
         expect(seq.increment).toBe(3);
-        expect(seq.config).toEqual({ length: 34, increment: 3 });
+        expect(seq.config).toEqual({ length: 34, increment: 3, selector: 'rotate' });
       });
     });
     describe("with full config", function() {
       it("object", function() {
-        let config = { length: 47, increment: 24 };
+        let config = { length: 47, increment: 24, selector: 'random' };
         let seq = new Sequence(config);
         expect(seq.length).toBe(47);
         expect(seq.increment).toBe(24);
-        expect(seq.config).toEqual(config);
+        expect(seq.config).toEqual({ ...config, selector: 'random' });
+      });
+    });
+    describe("with pictures", function() {
+      it("object", function() {
+        let pictures = new Pictures(SAMPLES);
+        pictures.reload();
+        let config = { pictures, selector: 'unshown' };
+        let seq = new Sequence(config);
+        expect(seq.length).toBe(pictures.length);
+        expect(seq.pictures).toBe(pictures);
+        expect(seq.config).toEqual({ length: pictures.length, increment: 1, selector: 'unshown' });
       });
     });
   });
@@ -157,49 +175,130 @@ describe("sequence", function() {
   });
 
   describe("index", function() {
-    for (let length = 3; length < 1000; length = Math.floor(length * 1.414)) {
-      describe("length " + length, function() {
-        let seq = new Sequence(length);
-        it("setup", function() {
-          expect(seq.length).toBe(length);
-          expect(seq.increment).toBeGreaterThan(0);
-          expect(seq.increment).toBeLessThan(length);
-          expect(seq.increment).toMatch(/^\d+$/);
-        });
-        let counts = [];
-        for (let i = 0; i < length; i++)
-          counts[i] = 0;
-
-        const n0 = 1 + Math.floor(Math.random() * 100);
-        function loop() {
-          for (let i = 0; i < length; i++) {
-            let n = seq.index(n0 + i);
-            expect(n).toBeGreaterThan(-1);
-            expect(n).toBeLessThan(length);
-            expect(n).toMatch(/^\d+$/);
-            counts[n]++;
-          }
-        }
-
-        it("first loop", function() {
-          loop();
-          for (let i = 0; i < length; i++)
-            expect(counts[i]).toBe(1);
-        });
-        it("second loop", function() {
-          loop();
-          for (let i = 0; i < length; i++)
-            expect(counts[i]).toBe(2);
-        });
-      });
+    function loop(seq, counts) {
+      if (counts == null)
+        counts = new Array(seq.length).fill(0);
+      const n0 = 1 + Math.floor(Math.random() * 100);
+      for (let i = 0; i < seq.length; i++) {
+        let n = seq.index(n0 + i);
+        expect(n).toBeGreaterThan(-1);
+        expect(n).toBeLessThan(seq.length);
+        expect(n).toMatch(/^\d+$/);
+        counts[n]++;
+      }
+      return counts;
     }
+    function loops(seq, n) {
+      let counts = loop(seq);
+      for (let i = 1; i < n; i++)
+        loop(seq, counts);
+      return counts;
+    }
+    function summarize(counts) {
+      let sum = counts.reduce((s, c) => s + c, 0);
+      let min, max;
+      counts.forEach((c, i) => {
+        if (i == 0)
+          min = max = c;
+        else {
+          if (c < min)
+            min = c;
+          if (c > max)
+            max = c;
+        }
+      });
+      return {
+        length: counts.length,
+        min, max, sum,
+        avg: sum / counts.length,
+      }
+    }
+
+    describe('rotate', function() {
+      for (let length = 3; length < 1000; length = Math.floor(length * 1.414)) {
+        describe("length " + length, function() {
+          let seq = new Sequence(length);
+          it("setup", function() {
+            expect(seq.length).toBe(length);
+            expect(seq.increment).toBeGreaterThan(0);
+            expect(seq.increment).toBeLessThan(length);
+            expect(seq.increment).toMatch(/^\d+$/);
+            expect(seq.selector).toBe('rotate');
+          });
+          let counts
+          it("first loop", function() {
+            counts = loop(seq);
+            for (let i = 0; i < length; i++)
+              expect(counts[i]).toBe(1);
+          });
+          it("second loop", function() {
+            loop(seq, counts);
+            for (let i = 0; i < length; i++)
+              expect(counts[i]).toBe(2);
+          });
+        });
+      }
+    });
+    describe('random', function() {
+      const N = 51;
+      let seq = new Sequence({ length: N, selector: 'random' });
+      it("setup", function() {
+        expect(seq.length).toBe(N);
+        expect(seq.selector).toBe('random');
+      });
+      it("distribution", function() {
+        const M = 500;
+        let counts = loops(seq, M);
+        let stats = summarize(counts);
+        expect(stats.length).toBe(N);
+        expect(stats.sum).toBe(N * M);
+        expect(stats.avg).toBeGreaterThan(M / 100);
+        expect(stats.min).toBeGreaterThan(stats.avg * 0.33);
+        expect(stats.max).toBeLessThan(stats.avg * 1.5);
+      });
+    });
+    describe('unshown', function() {
+      clearConfig(SAMPLES.pictures);
+      let pictures = new Pictures(SAMPLES);
+      pictures.reload();
+      pictures.switch('watch.jpeg');
+      execSync('sleep 1');
+      pictures.switch('drops.jpg');
+      let seq = new Sequence({ pictures, selector: 'unshown' });
+      it("setup", function() {
+        expect(seq.length).toBe(pictures.length);
+        expect(seq.selector).toBe('unshown');
+        expect(pictures.byIndex(0).file).toBe('balloons.png');
+        expect(pictures.byIndex(1).file).toBe('drops.jpg');
+        expect(pictures.byIndex(2).file).toBe('watch.jpeg');
+      });
+      it("only unshown", function() {
+        let counts = loop(seq);
+        expect(counts.length).toBe(3);
+        expect(counts[0]).toBe(pictures.length);
+        expect(counts[1]).toBe(0);
+        expect(counts[2]).toBe(0);
+      });
+      it("all shown", function() {
+        const M = 10_000;
+        pictures.switch('balloons.png');
+        execSync('sleep 1');
+        let counts = loops(seq, M);
+        console.log(counts);
+        expect(counts.length).toBe(3);
+        expect(counts[2]).toBeGreaterThan(0);
+        expect(counts[0]).toBeLessThan(counts[1]);
+        expect(counts[0]).toBeLessThan(counts[2]);
+        expect(counts[1]).toBeLessThan(counts[2]);
+      });
+    });
   });
 
   describe("save/load", function() {
     const path = "/tmp/sequence.json";
     it("prepare", function() {
       if (fs.existsSync(path))
-        fs.unlink(path);
+        fs.unlinkSync(path);
     });
 
     it("no file", function() {

@@ -1,32 +1,8 @@
 const path = require('path'),
       fs = require('fs'),
-      Pictures = require("../lib/pictures.js");
-
-const SAMPLES = {
-  pictures: path.join(__dirname, '/samples'),
-  extensions: ['jpg', 'jpeg', 'png']
-};
-
-function clearConfig(dir) {
-  const rmrecur = function(d) {
-    fs.readdirSync(d).forEach(function(f) {
-      let p = path.join(d, '/', f);
-      if (fs.lstatSync(p).isDirectory())
-        rmrecur(p);
-      else
-        fs.unlinkSync(p);
-    });
-    fs.rmdirSync(d);
-  };
-
-  let conf = path.join(dir, '/', '.pictureframe');
-  if (fs.existsSync(conf)) {
-    rmrecur(conf);
-    return true;
-  }
-
-  return false;
-}
+      { execSync } = require('child_process'),
+      Pictures = require("../lib/pictures.js"),
+      { SAMPLES, clearConfig } = require("./samples.js");
 
 function pad2(n) {
   if (n < 10)
@@ -94,12 +70,42 @@ describe("pictures", function() {
       expect(pictures.byIndex(1).file).toBe('drops.jpg');
       expect(pictures.byIndex(3)).not.toBeDefined();
     });
-    it("sorted", function() {
-      let sorted = pictures.sorted();
-      expect(sorted).toBeDefined();
-      expect(sorted.length).toBe(3);
-      expect(sorted[0].file).toBe('balloons.png');
-      expect(sorted[0].updated).toBeGreaterThan(new Date('2017-10-20'));
+    describe("sorted", function() {
+      it("default", function() {
+        let sorted = pictures.sorted();
+        expect(sorted).toBeDefined();
+        expect(sorted.length).toBe(3);
+        expect(sorted[0].file).toBe('balloons.png');
+        expect(sorted[0].updated).toBeGreaterThan(new Date('2017-10-20'));
+      });
+      it("name", function() {
+        let sorted = pictures.sorted('name');
+        expect(sorted).toBeDefined();
+        expect(sorted.length).toBe(3);
+        expect(sorted[0].file).toBe('balloons.png');
+        expect(sorted[0].updated).toBeGreaterThan(new Date('2017-10-20'));
+      });
+      it("-name", function() {
+        let sorted = pictures.sorted('-name');
+        expect(sorted).toBeDefined();
+        expect(sorted.length).toBe(3);
+        expect(sorted[0].file).toBe('watch.jpeg');
+        expect(sorted[0].updated).toBeGreaterThan(new Date('2017-10-20'));
+      });
+      it("shown", function() {
+        let sorted = pictures.sorted('shown');
+        expect(sorted).toBeDefined();
+        expect(sorted.length).toBe(3);
+        expect(sorted[0].file).toBe('balloons.png');
+        expect(sorted[0].updated).toBeGreaterThan(new Date('2017-10-20'));
+      });
+      it("-shown", function() {
+        let sorted = pictures.sorted('-shown');
+        expect(sorted).toBeDefined();
+        expect(sorted.length).toBe(3);
+        expect(sorted[0].file).toBe('watch.jpeg');
+        expect(sorted[0].updated).toBeGreaterThan(new Date('2017-10-20'));
+      });
     });
     it("forEach", function() {
       let f = [];
@@ -119,7 +125,7 @@ describe("pictures", function() {
 
   describe("history", function() {
     const minDate = new Date(new Date().getTime() - 1),
-          maxDate = new Date(new Date().getTime() + 500),
+          maxDate = new Date(new Date().getTime() + 5000),
           match = new RegExp('^' + minDate.getFullYear() + '-\\d{2}-\\d{2}T');
 
     it("prepare", function() {
@@ -130,6 +136,7 @@ describe("pictures", function() {
     it("setup", function() {
       pictures = new Pictures(SAMPLES);
       pictures.reload();
+      execSync('sleep 1');
       pictures.switch(pictures.byIndex(0));
     });
     it("save 1", function() {
@@ -151,6 +158,7 @@ describe("pictures", function() {
       expect(new Date(entry.lastShown)).toBeLessThan(maxDate);
     });
     it("save 2", function() {
+      execSync('sleep 1');
       pictures.switch('drops.jpg');
       pictures.saveHistory();
     });
@@ -176,6 +184,24 @@ describe("pictures", function() {
       expect(entry.lastShown).toMatch(match);
       expect(new Date(entry.lastShown)).toBeGreaterThan(minDate);
       expect(new Date(entry.lastShown)).toBeLessThan(maxDate);
+    });
+    describe("sorted", function() {
+      it("shown", function() {
+        let sorted = pictures.sorted('shown');
+        expect(sorted).toBeDefined();
+        expect(sorted.length).toBe(3);
+        expect(sorted[0].file).toBe('drops.jpg');
+        expect(sorted[1].file).toBe('balloons.png');
+        expect(sorted[2].file).toBe('watch.jpeg');
+      });
+      it("-shown", function() {
+        let sorted = pictures.sorted('-shown');
+        expect(sorted).toBeDefined();
+        expect(sorted.length).toBe(3);
+        expect(sorted[0].file).toBe('watch.jpeg');
+        expect(sorted[1].file).toBe('balloons.png');
+        expect(sorted[2].file).toBe('drops.jpg');
+      });
     });
   });
 

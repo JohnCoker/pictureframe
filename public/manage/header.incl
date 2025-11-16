@@ -35,7 +35,16 @@
        <ul class="dropdown-menu">
         <li><a href="?sort=name">by Name</a></li>
         <li><a href="?sort=shown">by Last Shown</a></li>
+        <li><a href="?sort=-shown">by Unshown</a></li>
         <li><a href="?sort=updated">by Upload Date</a></li>
+       </ul>
+     </li>
+     <li class="dropdown" title="next photo selection">
+       <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Select <span class="caret"></span></a>
+       <ul class="dropdown-menu">
+        <li><a href="?select=rotate">Day Rotation</a></li>
+        <li><a href="?select=random">Pure Random</a></li>
+        <li><a href="?select=unshown">Unshown Random</a></li>
        </ul>
      </li>
      <li class="dropdown" title="manage pictures">
